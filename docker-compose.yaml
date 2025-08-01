@@ -1,0 +1,140 @@
+# This file defines the entire QuickBite application stack for local development.
+# To run: docker-compose up -d
+
+
+
+services:
+  # ----------------------------------------
+  # INFRASTRUCTURE SERVICES
+  # ----------------------------------------
+
+  # PostgreSQL Database for Identity and Order services
+  postgres:
+    image: postgres:14-alpine
+    container_name: quickbite-postgres
+    ports:
+      - "5432:5432" # Expose port to host for easy access with a DB client
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persist data
+    environment:
+      POSTGRES_USER: quickbite_user
+      POSTGRES_PASSWORD: quickbite_password
+      POSTGRES_DB: quickbite_db
+    networks:
+      - quickbite-net
+
+  # MongoDB Database for the Restaurant service
+  mongo:
+    image: mongo:6.0
+    container_name: quickbite-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - quickbite-net
+
+  # RabbitMQ Message Broker for event-driven communication
+  rabbitmq:
+    image: rabbitmq:3.9-management-alpine
+    container_name: quickbite-rabbitmq
+    ports:
+      - "5672:5672"   # AMQP port for services
+      - "15672:15672" # Management UI port (user: guest, pass: guest)
+    networks:
+      - quickbite-net
+
+  # ----------------------------------------
+  # APPLICATION SERVICES
+  # ----------------------------------------
+
+  # API Gateway: The single entry point for all client requests.
+  # We will build this service later.
+  api-gateway:
+    build:
+      context: ./services/api-gateway # Path to the Dockerfile
+      dockerfile: Dockerfile
+    container_name: quickbite-api-gateway
+    ports:
+      - "3000:3000"
+    depends_on:
+      - identity-service
+      - restaurant-service
+      - order-service
+    networks:
+      - quickbite-net
+    environment:
+      NODE_ENV: development
+
+  # Identity Service: Manages users, registration, login.
+  # We will build this service first.
+  identity-service:
+    build:
+      context: ./services/identity-service
+      dockerfile: Dockerfile
+    container_name: quickbite-identity-service
+    depends_on:
+      - postgres
+    networks:
+      - quickbite-net
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: "postgresql://quickbite_user:quickbite_password@postgres:5432/quickbite_db"
+
+  # Restaurant Service: Manages restaurant profiles and menus.
+  restaurant-service:
+    build:
+      context: ./services/restaurant-service
+      dockerfile: Dockerfile
+    container_name: quickbite-restaurant-service
+    depends_on:
+      - mongo
+    networks:
+      - quickbite-net
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: "mongodb://mongo:27017/quickbite_restaurants"
+
+  # Order Service: Manages order creation and state.
+  order-service:
+    build:
+      context: ./services/order-service
+      dockerfile: Dockerfile
+    container_name: quickbite-order-service
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - quickbite-net
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: "postgresql://quickbite_user:quickbite_password@postgres:5432/quickbite_db"
+      RABBITMQ_URL: "amqp://guest:guest@rabbitmq:5672"
+
+  # Notification Service: Listens for events and sends notifications.
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    container_name: quickbite-notification-service
+    depends_on:
+      - rabbitmq
+    networks:
+      - quickbite-net
+    environment:
+      NODE_ENV: development
+      RABBITMQ_URL: "amqp://guest:guest@rabbitmq:5672"
+
+# ----------------------------------------
+# VOLUMES & NETWORKS
+# ----------------------------------------
+
+# Volumes to persist database data across container restarts
+volumes:
+  postgres_data:
+  mongo_data:
+
+# Custom network for all services to communicate with each other by name
+networks:
+  quickbite-net:
+    driver: bridge
