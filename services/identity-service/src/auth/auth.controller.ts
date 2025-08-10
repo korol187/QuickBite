@@ -41,4 +41,9 @@ export class AuthController {
     const { password, ...user } = req.user;
     return user;
   }
+
+  @Get('health')
+  check() {
+    return { status: 'ok' };
+  }
 }
