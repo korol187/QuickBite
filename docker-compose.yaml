@@ -50,21 +50,21 @@ services:
 
   # API Gateway: The single entry point for all client requests.
   # We will build this service later.
-  api-gateway:
-    build:
-      context: ./services/api-gateway # Path to the Dockerfile
-      dockerfile: Dockerfile
-    container_name: quickbite-api-gateway
-    ports:
-      - "3000:3000"
-    depends_on:
-      - identity-service
-      - restaurant-service
-      - order-service
-    networks:
-      - quickbite-net
-    environment:
-      NODE_ENV: development
+  # api-gateway:
+  #   build:
+  #     context: ./services/api-gateway # Path to the Dockerfile
+  #     dockerfile: Dockerfile
+  #   container_name: quickbite-api-gateway
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - identity-service
+  #     - restaurant-service
+  #     - order-service
+  #   networks:
+  #     - quickbite-net
+  #   environment:
+  #     NODE_ENV: development
 
   # Identity Service: Manages users, registration, login.
   # We will build this service first.
@@ -82,48 +82,48 @@ services:
       DATABASE_URL: "postgresql://quickbite_user:quickbite_password@postgres:5432/quickbite_db"
 
   # Restaurant Service: Manages restaurant profiles and menus.
-  restaurant-service:
-    build:
-      context: ./services/restaurant-service
-      dockerfile: Dockerfile
-    container_name: quickbite-restaurant-service
-    depends_on:
-      - mongo
-    networks:
-      - quickbite-net
-    environment:
-      NODE_ENV: development
-      DATABASE_URL: "mongodb://mongo:27017/quickbite_restaurants"
+  # restaurant-service:
+  #   build:
+  #     context: ./services/restaurant-service
+  #     dockerfile: Dockerfile
+  #   container_name: quickbite-restaurant-service
+  #   depends_on:
+  #     - mongo
+  #   networks:
+  #     - quickbite-net
+  #   environment:
+  #     NODE_ENV: development
+  #     DATABASE_URL: "mongodb://mongo:27017/quickbite_restaurants"
 
   # Order Service: Manages order creation and state.
-  order-service:
-    build:
-      context: ./services/order-service
-      dockerfile: Dockerfile
-    container_name: quickbite-order-service
-    depends_on:
-      - postgres
-      - rabbitmq
-    networks:
-      - quickbite-net
-    environment:
-      NODE_ENV: development
-      DATABASE_URL: "postgresql://quickbite_user:quickbite_password@postgres:5432/quickbite_db"
-      RABBITMQ_URL: "amqp://guest:guest@rabbitmq:5672"
+  # order-service:
+  #   build:
+  #     context: ./services/order-service
+  #     dockerfile: Dockerfile
+  #   container_name: quickbite-order-service
+  #   depends_on:
+  #     - postgres
+  #     - rabbitmq
+  #   networks:
+  #     - quickbite-net
+  #   environment:
+  #     NODE_ENV: development
+  #     DATABASE_URL: "postgresql://quickbite_user:quickbite_password@postgres:5432/quickbite_db"
+  #     RABBITMQ_URL: "amqp://guest:guest@rabbitmq:5672"
 
   # Notification Service: Listens for events and sends notifications.
-  notification-service:
-    build:
-      context: ./services/notification-service
-      dockerfile: Dockerfile
-    container_name: quickbite-notification-service
-    depends_on:
-      - rabbitmq
-    networks:
-      - quickbite-net
-    environment:
-      NODE_ENV: development
-      RABBITMQ_URL: "amqp://guest:guest@rabbitmq:5672"
+  # notification-service:
+  #   build:
+  #     context: ./services/notification-service
+  #     dockerfile: Dockerfile
+  #   container_name: quickbite-notification-service
+  #   depends_on:
+  #     - rabbitmq
+  #   networks:
+  #     - quickbite-net
+  #   environment:
+  #     NODE_ENV: development
+  #     RABBITMQ_URL: "amqp://guest:guest@rabbitmq:5672"
 
 # ----------------------------------------
 # VOLUMES & NETWORKS

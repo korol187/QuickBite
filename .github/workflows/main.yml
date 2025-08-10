@@ -1,0 +1,73 @@
+name: QuickBite CI
+
+# This workflow runs on pushes or pull requests to the main branch
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    # Define a strategy to run the job for each of our services
+    strategy:
+      matrix:
+        service: [ 'identity-service']
+        # service: [ 'identity-service', 'restaurant-service', 'order-service', 'notification-service', 'api-gateway' ]
+        
+    steps:
+      # Step 1: Check out the repository code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.5.0'
+          cache: 'npm'
+          cache-dependency-path: services/${{ matrix.service }}/package-lock.json
+
+      # Step 2: Get a list of changed files
+      # This is key for our monorepo. We'll use this list to decide
+      # whether to run the tests for a specific service.
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v35
+        with:
+          files: |
+            services/${{ matrix.service }}/**
+
+
+
+      # Step 4: Install dependencies
+      # This step also only runs if there were changes
+      - name: Install Dependencies
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          cd services/${{ matrix.service }}
+          npm ci
+
+      # Step 5: Run Linter
+      - name: Run Linter
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          cd services/${{ matrix.service }}
+          npm run lint
+
+      # Step 6: Run Tests
+      - name: Run Tests
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          cd services/${{ matrix.service }}
+          npm run test
+
+      # Step 7: Run Build
+      - name: Run Build
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          cd services/${{ matrix.service }}
+          npm run build

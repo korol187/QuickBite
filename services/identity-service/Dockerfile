@@ -2,7 +2,7 @@
 
 # ---- Builder Stage ----
 # This stage installs dependencies and builds the application.
-FROM node:18-alpine AS builder
+FROM node:24.5.0-alpine3.22 AS builder
 
 # Set the working directory
 WORKDIR /usr/src/app
