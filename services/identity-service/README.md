@@ -1,98 +1,100 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Identity Service
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Overview
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+The Identity Service is a core component of the **QuickBite** microservices application. Its primary responsibility is to manage user identity, including registration, login (authentication), and session management via JSON Web Tokens (JWTs). It acts as the central authority for user data and credentials.
 
-## Description
+This service is built to demonstrate proficiency in backend development, database management, and secure API design, as outlined in the parent project's goals.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Technology Stack
 
-## Project setup
+- **Framework:** Node.js with NestJS (TypeScript)
+- **Database:** PostgreSQL
+- **ORM:** Prisma
+- **Authentication:** Passport.js with JWT Strategy
+- **Containerization:** Docker
 
-```bash
-$ npm install
-```
+## Environment Variables
 
-## Compile and run the project
+To run this service, you need to configure the following environment variables. You can create a `.env` file in this directory (`services/identity-service`) to store them for local development.
 
-```bash
-# development
-$ npm run start
+| Variable       | Description                                                                 | Example                                                      |
+| :------------- | :-------------------------------------------------------------------------- | :----------------------------------------------------------- |
+| `DATABASE_URL` | The connection string for the PostgreSQL database.                          | `postgresql://user:password@localhost:5432/identitydb`       |
+| `JWT_SECRET`   | A secret key used to sign and verify JSON Web Tokens.                       | `your-super-secret-and-long-string-for-jwt`                  |
+| `PORT`         | The port on which the service will listen for incoming requests. (Optional) | `3001`                                                       |
 
-# watch mode
-$ npm run start:dev
+## API Endpoints
 
-# production mode
-$ npm run start:prod
-```
+### Authentication
 
-## Run tests
+#### `POST /auth/register`
 
-```bash
-# unit tests
-$ npm run test
+Registers a new user in the system.
 
-# e2e tests
-$ npm run test:e2e
+- **Request Body:**
 
-# test coverage
-$ npm run test:cov
-```
+  ```json
+  {
+    "email": "test.user@example.com",
+    "password": "aVeryStrongPassword123!",
+    "role": "USER"
+  }
+  ```
 
-## Deployment
+- **Responses:**
+  - `201 Created`: Successfully created the user. Returns the user object (without the password).
+  - `400 Bad Request`: If the request body is invalid (e.g., missing fields, invalid email).
+  - `409 Conflict`: If a user with the same email already exists.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Getting Started
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Prerequisites
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+- Docker and Docker Compose
+- Node.js and npm (for local development)
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Installation & Running
 
-## Resources
+#### Using Docker (Recommended)
 
-Check out a few resources that may come in handy when working with NestJS:
+The service is designed to be run as part of the main `docker-compose.yml` at the project root. This is the easiest way to get the entire QuickBite application stack, including databases, running.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+1.  **From the project root, run:**
+    ```bash
+    docker-compose up -d
+    ```
+2.  To run only this service:
+    ```bash
+    docker-compose up -d identity-service
+    ```
 
-## Support
+#### Local Development
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+1.  **Navigate to the service directory:**
+    ```bash
+    cd services/identity-service
+    ```
+2.  **Create a `.env` file** and add the required environment variables (see above).
+3.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+4.  **Run the database migrations:**
+    ```bash
+    npx prisma migrate dev
+    ```
+5.  **Start the service:**
+    ```bash
+    npm run start:dev
+    ```
 
-## Stay in touch
+## Available Scripts
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- `npm run build`: Compiles the TypeScript code for production.
+- `npm run format`: Formats the code using Prettier.
+- `npm run start`: Starts the application in production mode.
+- `npm run start:dev`: Starts the application in development mode with file watching.
+- `npm run lint`: Lints the codebase using ESLint.
+- `npm test`: Runs unit tests using Jest.
+- `npm run test:e2e`: Runs end-to-end tests.

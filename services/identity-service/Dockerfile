@@ -1,49 +1,74 @@
 # Dockerfile for the NestJS Identity Service
 
-# ---- Builder Stage ----
-# This stage installs dependencies and builds the application.
-FROM node:24.5.0-alpine3.22 AS builder
+# ---- Base Stage ----
+# This stage contains common configuration for all stages
+FROM node:24.5.0-alpine3.22 AS base
 
-# Set the working directory
+# Install dependencies needed for Prisma (especially for native binaries)
+RUN apk add --no-cache openssl
+
+# Create app directory
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json to leverage Docker layer caching
+# Create non-root user for security
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nestjs -u 1001
+
+# ---- Dependencies Stage ----
+# This stage installs all dependencies (including dev dependencies)
+FROM base AS deps
+
+# Copy package files
 COPY package*.json ./
+COPY prisma ./prisma/
 
-# Install dependencies
-RUN npm install
+# Install all dependencies
+RUN npm ci --only=production --frozen-lockfile && \
+    cp -R node_modules prod_node_modules && \
+    npm ci --frozen-lockfile
 
-# Copy the rest of the application source code
+# ---- Builder Stage ----
+# This stage builds the application
+FROM base AS builder
+
+# Copy dependencies from deps stage
+COPY --from=deps /usr/src/app/node_modules ./node_modules
+COPY --from=deps /usr/src/app/prisma ./prisma
+
+# Copy source code
 COPY . .
 
-# Generate the Prisma client based on the schema
-# This is crucial for your database interactions to work
+# Generate Prisma client
 RUN npx prisma generate
 
-# Build the TypeScript project into JavaScript
-RUN npm run build
+# Build the application
+RUN npm run build && npm prune --omit=dev
 
 # ---- Production Stage ----
-# This stage creates the final, lean image for running the application.
-FROM node:18-alpine
+# This stage creates the final, lean image for running the application
+FROM base AS runner
 
-# Set the working directory
-WORKDIR /usr/src/app
+# Copy production dependencies
+COPY --from=deps /usr/src/app/prod_node_modules ./node_modules
 
-# Copy only the production dependencies from the builder stage
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-COPY --from=builder /usr/src/app/package*.json ./
-
-# Copy the built application from the builder stage
+# Copy built application
 COPY --from=builder /usr/src/app/dist ./dist
-
-# Copy the Prisma schema and client engine
 COPY --from=builder /usr/src/app/prisma ./prisma
 COPY --from=builder /usr/src/app/node_modules/.prisma ./node_modules/.prisma
 
+# Copy package.json for metadata
+COPY --from=builder /usr/src/app/package*.json ./
 
-# The default port for a NestJS application is 3000
+# Change ownership to non-root user
+RUN chown -R nestjs:nodejs /usr/src/app
+USER nestjs
+
+# Expose port
 EXPOSE 3000
 
-# The command to start the application
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node --version || exit 1
+
+# Start the application
 CMD ["node", "dist/main"]

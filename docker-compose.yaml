@@ -82,6 +82,7 @@ services:
     environment:
       NODE_ENV: development
       DATABASE_URL: "postgresql://quickbite_user:quickbite_password@postgres:5432/quickbite_db"
+      JWT_SECRET: "your-super-secret-jwt-key-change-in-production"
 
   # Restaurant Service: Manages restaurant profiles and menus.
   # restaurant-service:

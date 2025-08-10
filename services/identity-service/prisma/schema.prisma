@@ -1,28 +1,17 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  // The DATABASE_URL is read from the .env file (or environment variables)
-  // We initialized prisma with this, but it's good practice to have it here.
-  // In our case, it's passed from docker-compose.yml
   url      = env("DATABASE_URL")
 }
 
-// Defines the User model which maps to the "users" table in the database.
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  
-  // We can add roles for basic authorization later
-  // e.g., "USER", "RESTAURANT_OWNER", "ADMIN"
-  role      String   @default("USER")
-
+  id       String @id @default(uuid())
+  email    String @unique
+  password String
+  role String @default("USER")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
