@@ -27,6 +27,34 @@ RUN npm ci --only=production --frozen-lockfile && \
     cp -R node_modules prod_node_modules && \
     npm ci --frozen-lockfile
 
+# ---- Development Stage ----
+# This stage is optimized for development with hot reload
+FROM base AS development
+
+# Copy package files
+COPY package*.json ./
+COPY prisma ./prisma/
+
+# Install all dependencies (including dev dependencies)
+RUN npm ci --frozen-lockfile
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Copy TypeScript configuration
+COPY tsconfig*.json ./
+COPY nest-cli.json ./
+
+# Create directories and set permissions
+RUN mkdir -p src dist && chown -R nestjs:nodejs /usr/src/app
+USER nestjs
+
+# Expose port
+EXPOSE 3000
+
+# Start in development mode with watch
+CMD ["npm", "run", "start:dev"]
+
 # ---- Builder Stage ----
 # This stage builds the application
 FROM base AS builder
