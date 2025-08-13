@@ -92,7 +92,6 @@ services:
       - ./services/identity-service/tsconfig.json:/usr/src/app/tsconfig.json:ro
       - ./services/identity-service/tsconfig.build.json:/usr/src/app/tsconfig.build.json:ro
       - ./services/identity-service/nest-cli.json:/usr/src/app/nest-cli.json:ro
-    command: npm run start:dev
 
   # Restaurant Service: Manages restaurant profiles and menus.
   # restaurant-service:

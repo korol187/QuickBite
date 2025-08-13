@@ -46,7 +46,7 @@ COPY tsconfig*.json ./
 COPY nest-cli.json ./
 
 # Create directories and set permissions
-RUN mkdir -p src dist && chown -R nestjs:nodejs /usr/src/app
+RUN mkdir -p src dist && chown -R nestjs:nodejs /usr/src/app/dist /usr/src/app/prisma /usr/src/app/node_modules
 USER nestjs
 
 # Expose port

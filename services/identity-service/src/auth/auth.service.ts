@@ -23,7 +23,7 @@ export class AuthService {
 
   async register(
     registerUserDto: RegisterUserDto,
-  ): Promise<Omit<User, 'password'>> {
+  ): Promise<{ message: string }> {
     const { email, password } = registerUserDto;
     this.logger.log(`Starting user registration for email: ${email}`);
     let existingUser: User | null;
@@ -56,9 +56,7 @@ export class AuthService {
         `User successfully registered: ${email} (ID: ${user.id})`,
       );
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password: _, ...result } = user;
-      return result;
+      return { message: 'User registered successfully' };
     } catch (error) {
       this.logger.error('Error creating user', error.stack);
       throw new InternalServerErrorException('Failed to create user');

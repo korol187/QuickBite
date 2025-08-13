@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 # Development helper script for QuickBite
 
 echo "🚀 Starting QuickBite in development mode..."
