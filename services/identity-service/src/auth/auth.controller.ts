@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '@prisma/client';
 
@@ -21,17 +12,13 @@ export class AuthController {
 
   @Post('register')
   @HttpCode(HttpStatus.OK)
-  async register(
-    @Body() registerUserDto: RegisterUserDto,
-  ): Promise<{ message: string }> {
+  async register(@Body() registerUserDto: RegisterUserDto): Promise<{ message: string }> {
     return this.authService.register(registerUserDto);
   }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(
-    @Body() loginUserDto: LoginUserDto,
-  ): Promise<{ access_token: string }> {
+  async login(@Body() loginUserDto: LoginUserDto): Promise<{ access_token: string }> {
     return this.authService.login(loginUserDto);
   }
 

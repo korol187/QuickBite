@@ -75,7 +75,7 @@ services:
       target: development  # Use the development stage for hot reload
     container_name: quickbite-identity-service
     ports:
-      - "3001:3000"  # Expose port 3000 from container to port 3001 on host
+      - "3000:3000"  # Expose port 3000 from container to port 3000 on host
     depends_on:
       - postgres
     networks:
@@ -85,7 +85,7 @@ services:
       DATABASE_URL: "postgresql://quickbite_user:quickbite_password@postgres:5432/quickbite_db"
       JWT_SECRET: "your-super-secret-jwt-key-change-in-production"
     volumes:
-      - ./services/identity-service/src:/usr/src/app/src:ro  # Mount source code for hot reload
+      - ./services/identity-service/src:/usr/src/app/src  # Mount source code for hot reload
       - ./services/identity-service/prisma:/usr/src/app/prisma:ro  # Mount Prisma schema
       - ./services/identity-service/package.json:/usr/src/app/package.json:ro
       - ./services/identity-service/package-lock.json:/usr/src/app/package-lock.json:ro
@@ -94,18 +94,28 @@ services:
       - ./services/identity-service/nest-cli.json:/usr/src/app/nest-cli.json:ro
 
   # Restaurant Service: Manages restaurant profiles and menus.
-  # restaurant-service:
-  #   build:
-  #     context: ./services/restaurant-service
-  #     dockerfile: Dockerfile
-  #   container_name: quickbite-restaurant-service
-  #   depends_on:
-  #     - mongo
-  #   networks:
-  #     - quickbite-net
-  #   environment:
-  #     NODE_ENV: development
-  #     DATABASE_URL: "mongodb://mongo:27017/quickbite_restaurants"
+  restaurant-service:
+    build:
+      context: ./services/restaurant-service
+      dockerfile: Dockerfile
+      target: development # Use the development stage for hot reload
+    container_name: quickbite-restaurant-service
+    ports:
+      - "3001:3001" # Expose port 3001 from container to port 3001 on host
+    depends_on:
+      - mongo
+    networks:
+      - quickbite-net
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: "mongodb://mongo:27017/quickbite_restaurants"
+    volumes:
+      - ./services/restaurant-service/src:/usr/src/app/src # Mount source code for hot reload
+      - ./services/restaurant-service/package.json:/usr/src/app/package.json:ro
+      - ./services/restaurant-service/package-lock.json:/usr/src/app/package-lock.json:ro
+      - ./services/restaurant-service/tsconfig.json:/usr/src/app/tsconfig.json:ro
+      - ./services/restaurant-service/tsconfig.build.json:/usr/src/app/tsconfig.build.json:ro
+      - ./services/restaurant-service/nest-cli.json:/usr/src/app/nest-cli.json:ro
 
   # Order Service: Manages order creation and state.
   # order-service:

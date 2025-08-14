@@ -1,9 +1,4 @@
-import {
-  ConflictException,
-  InternalServerErrorException,
-  Logger,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ConflictException, InternalServerErrorException, Logger, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { User } from '@prisma/client';
@@ -97,21 +92,14 @@ describe('AuthService', () => {
 
     it('should throw a ConflictException if user already exists', async () => {
       mockPrismaService.user.findUnique.mockResolvedValue(user);
-      await expect(service.register(registerUserDto)).rejects.toThrow(
-        ConflictException,
-      );
+      await expect(service.register(registerUserDto)).rejects.toThrow(ConflictException);
     });
 
     it('should throw an InternalServerErrorException on database error during find', async () => {
       const dbError = new Error('Database connection failed');
       mockPrismaService.user.findUnique.mockRejectedValue(dbError);
-      await expect(service.register(registerUserDto)).rejects.toThrow(
-        InternalServerErrorException,
-      );
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        'Error during user registration',
-        dbError.stack,
-      );
+      await expect(service.register(registerUserDto)).rejects.toThrow(InternalServerErrorException);
+      expect(mockLogger.error).toHaveBeenCalledWith('Error during user registration', dbError.stack);
     });
 
     it('should throw an InternalServerErrorException on database error during create', async () => {
@@ -119,13 +107,8 @@ describe('AuthService', () => {
       mockPrismaService.user.findUnique.mockResolvedValue(null);
       (bcrypt.hash as jest.Mock).mockResolvedValue(hashedPassword);
       mockPrismaService.user.create.mockRejectedValue(dbError);
-      await expect(service.register(registerUserDto)).rejects.toThrow(
-        InternalServerErrorException,
-      );
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        'Error during user registration',
-        dbError.stack,
-      );
+      await expect(service.register(registerUserDto)).rejects.toThrow(InternalServerErrorException);
+      expect(mockLogger.error).toHaveBeenCalledWith('Error during user registration', dbError.stack);
     });
   });
 
@@ -152,10 +135,7 @@ describe('AuthService', () => {
       const result = await service.validateUser(loginUserDto);
 
       expect(result).toEqual(expectedUser);
-      expect(bcrypt.compare).toHaveBeenCalledWith(
-        loginUserDto.password,
-        user.password,
-      );
+      expect(bcrypt.compare).toHaveBeenCalledWith(loginUserDto.password, user.password);
     });
 
     it('should return null if user is not found', async () => {
@@ -176,10 +156,7 @@ describe('AuthService', () => {
       mockPrismaService.user.findUnique.mockRejectedValue(dbError);
       const result = await service.validateUser(loginUserDto);
       expect(result).toBeNull();
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        'Error during user validation',
-        dbError.stack,
-      );
+      expect(mockLogger.error).toHaveBeenCalledWith('Error during user validation', dbError.stack);
     });
   });
 
@@ -213,9 +190,7 @@ describe('AuthService', () => {
 
     it('should throw an UnauthorizedException if validation fails', async () => {
       jest.spyOn(service, 'validateUser').mockResolvedValue(null);
-      await expect(service.login(loginUserDto)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.login(loginUserDto)).rejects.toThrow(UnauthorizedException);
     });
   });
 });

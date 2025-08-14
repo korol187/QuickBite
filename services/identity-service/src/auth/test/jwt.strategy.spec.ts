@@ -72,9 +72,7 @@ describe('JwtStrategy', () => {
     it('should throw an UnauthorizedException if user is not found', async () => {
       mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-      await expect(strategy.validate(payload)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(strategy.validate(payload)).rejects.toThrow(UnauthorizedException);
     });
   });
 });

@@ -22,9 +22,7 @@ export class AuthService {
     private readonly logger: Logger,
   ) {}
 
-  async register(
-    registerUserDto: RegisterUserDto,
-  ): Promise<{ message: string }> {
+  async register(registerUserDto: RegisterUserDto): Promise<{ message: string }> {
     this.logger.log('Attempting to register user', {
       email: registerUserDto.email,
     });
@@ -59,9 +57,7 @@ export class AuthService {
     }
   }
 
-  async validateUser(
-    loginUserDto: LoginUserDto,
-  ): Promise<Omit<User, 'password'> | null> {
+  async validateUser(loginUserDto: LoginUserDto): Promise<Omit<User, 'password'> | null> {
     this.logger.log('Attempting to validate user', {
       email: loginUserDto.email,
     });
@@ -70,10 +66,7 @@ export class AuthService {
         where: { email: loginUserDto.email },
       });
 
-      if (
-        user &&
-        (await bcrypt.compare(loginUserDto.password, user.password))
-      ) {
+      if (user && (await bcrypt.compare(loginUserDto.password, user.password))) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { password, ...result } = user;
         this.logger.log('User validation successful', { userId: user.id });
