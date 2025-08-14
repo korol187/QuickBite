@@ -1,90 +1,87 @@
 import {
-  Injectable,
   ConflictException,
+  Injectable,
   InternalServerErrorException,
-  UnauthorizedException,
   Logger,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { RegisterUserDto } from './dto/register-user.dto';
-import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { LoginUserDto } from './dto/login-user.dto';
 import { User } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
+
+import { PrismaService } from '../prisma/prisma.service';
+
+import { LoginUserDto } from './dto/login-user.dto';
+import { RegisterUserDto } from './dto/register-user.dto';
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
-
   constructor(
-    private prisma: PrismaService,
-    private jwtService: JwtService,
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
+    private readonly logger: Logger,
   ) {}
 
   async register(
     registerUserDto: RegisterUserDto,
   ): Promise<{ message: string }> {
-    const { email, password } = registerUserDto;
-    this.logger.log(`Starting user registration for email: ${email}`);
-    let existingUser: User | null;
+    this.logger.log('Attempting to register user', {
+      email: registerUserDto.email,
+    });
     try {
-      existingUser = await this.prisma.user.findUnique({
-        where: { email },
+      const existingUser = await this.prisma.user.findUnique({
+        where: { email: registerUserDto.email },
       });
-    } catch (error) {
-      this.logger.error('Error checking user existence', error.stack);
-      throw new InternalServerErrorException('Error checking user existence');
-    }
 
-    if (existingUser) {
-      this.logger.warn(
-        `Registration attempt failed - user already exists: ${email}`,
-      );
-      throw new ConflictException('User with this email already exists');
-    }
+      if (existingUser) {
+        this.logger.warn('Registration failed: User already exists', {
+          email: registerUserDto.email,
+        });
+        throw new ConflictException('User with this email already exists');
+      }
 
-    try {
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(registerUserDto.password, 10);
       const user = await this.prisma.user.create({
         data: {
-          email,
+          email: registerUserDto.email,
           password: hashedPassword,
         },
       });
 
-      this.logger.log(
-        `User successfully registered: ${email} (ID: ${user.id})`,
-      );
-
+      this.logger.log('User registered successfully', { userId: user.id });
       return { message: 'User registered successfully' };
     } catch (error) {
-      this.logger.error('Error creating user', error.stack);
-      throw new InternalServerErrorException('Failed to create user');
+      if (error instanceof ConflictException) {
+        throw error;
+      }
+      this.logger.error('Error during user registration', error.stack);
+      throw new InternalServerErrorException('Could not register user');
     }
   }
 
   async validateUser(
     loginUserDto: LoginUserDto,
   ): Promise<Omit<User, 'password'> | null> {
-    const { email, password } = loginUserDto;
+    this.logger.log('Attempting to validate user', {
+      email: loginUserDto.email,
+    });
     try {
-      const user = await this.prisma.user.findUnique({ where: { email } });
+      const user = await this.prisma.user.findUnique({
+        where: { email: loginUserDto.email },
+      });
 
-      if (!user) {
-        this.logger.debug(`User not found: ${email}`);
-        return null;
-      }
-
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-
-      if (isPasswordValid) {
+      if (
+        user &&
+        (await bcrypt.compare(loginUserDto.password, user.password))
+      ) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { password: _, ...result } = user;
+        const { password, ...result } = user;
+        this.logger.log('User validation successful', { userId: user.id });
         return result;
-      } else {
-        this.logger.debug(`Password validation failed for: ${email}`);
-        return null;
       }
+
+      this.logger.warn('User validation failed', { email: loginUserDto.email });
+      return null;
     } catch (error) {
       this.logger.error('Error during user validation', error.stack);
       return null;
