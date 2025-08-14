@@ -1,16 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { RestaurantRepository } from './repositories/restaurant.repository';
-import { Restaurant } from './schemas/restaurant.schema';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
+import { RestaurantRepository } from './repositories/restaurant.repository';
+import { Restaurant } from './schemas/restaurant.schema';
 
 @Injectable()
 export class RestaurantsService {
   constructor(private readonly restaurantRepository: RestaurantRepository) {}
 
-  async create(
-    createRestaurantDto: CreateRestaurantDto,
-  ): Promise<Restaurant> {
+  async create(createRestaurantDto: CreateRestaurantDto): Promise<Restaurant> {
     return this.restaurantRepository.create(createRestaurantDto);
   }
 
@@ -22,10 +20,7 @@ export class RestaurantsService {
     return this.restaurantRepository.findById(id);
   }
 
-  async update(
-    id: string,
-    updateRestaurantDto: UpdateRestaurantDto,
-  ): Promise<Restaurant> {
+  async update(id: string, updateRestaurantDto: UpdateRestaurantDto): Promise<Restaurant> {
     return this.restaurantRepository.update(id, updateRestaurantDto);
   }
 

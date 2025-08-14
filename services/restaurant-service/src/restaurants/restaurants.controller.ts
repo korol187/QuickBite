@@ -10,12 +10,12 @@ import {
   // UseInterceptors, // Removed this import
 } from '@nestjs/common';
 // import { AuthGuard } from '@nestjs/passport'; // Removed this import
-import { RestaurantsService } from './restaurants.service';
+import { Roles } from '../common/decorators/roles.decorator';
+import { RolesGuard } from '../common/guards/roles.guard';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
+import { RestaurantsService } from './restaurants.service';
 import { Restaurant } from './schemas/restaurant.schema';
-import { RolesGuard } from '../common/guards/roles.guard';
-import { Roles } from '../common/decorators/roles.decorator';
 // import { JwtAuthInterceptor } from '../common/interceptors/jwt-auth.interceptor'; // Removed this import
 
 @Controller('restaurants')
@@ -44,10 +44,7 @@ export class RestaurantsController {
 
   @Patch(':id')
   @Roles('ADMIN') // Only ADMIN can update
-  update(
-    @Param('id') id: string,
-    @Body() updateRestaurantDto: UpdateRestaurantDto,
-  ): Promise<Restaurant> {
+  update(@Param('id') id: string, @Body() updateRestaurantDto: UpdateRestaurantDto): Promise<Restaurant> {
     return this.restaurantsService.update(id, updateRestaurantDto);
   }
 
@@ -56,4 +53,3 @@ export class RestaurantsController {
     return this.restaurantsService.remove(id);
   }
 }
-

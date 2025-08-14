@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, UnauthorizedException } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { JwtService } from '../../auth/jwt.service'; // Import the new JwtService
 
@@ -26,7 +20,7 @@ export class JwtAuthInterceptor implements NestInterceptor {
       const payload = await this.jwtService.verify(token);
       request.user = payload; // Attach user payload to the request
       return next.handle();
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('Invalid token');
     }
   }

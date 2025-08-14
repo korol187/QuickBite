@@ -2,9 +2,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { User } from '@prisma/client';
-
 import { PrismaService } from '../../prisma/prisma.service';
-
 import { JwtStrategy } from '../jwt.strategy';
 
 const mockPrismaService = {

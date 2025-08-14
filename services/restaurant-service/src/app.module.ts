@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core'; // Re-added this line
-
+import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
-import { RestaurantsModule } from './restaurants/restaurants.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtService } from './auth/jwt.service'; // Import the new JwtService
 import { JwtAuthInterceptor } from './common/interceptors/jwt-auth.interceptor'; // Re-added this import
+import { RestaurantsModule } from './restaurants/restaurants.module';
 
 @Module({
   imports: [
@@ -16,7 +15,7 @@ import { JwtAuthInterceptor } from './common/interceptors/jwt-auth.interceptor';
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService) => ({
         uri: configService.get<string>('DATABASE_URL'),
       }),
       inject: [ConfigService],
@@ -34,4 +33,3 @@ import { JwtAuthInterceptor } from './common/interceptors/jwt-auth.interceptor';
   ],
 })
 export class AppModule {}
-
