@@ -14,8 +14,8 @@ jobs:
     # Define a strategy to run the job for each of our services
     strategy:
       matrix:
-        service: [ 'identity-service']
-        # service: [ 'identity-service', 'restaurant-service', 'order-service', 'notification-service', 'api-gateway' ]
+        service: [ 'identity-service', 'restaurant-service']
+        # service: [ 'order-service', 'notification-service', 'api-gateway' ]
         
     steps:
       # Step 1: Check out the repository code
