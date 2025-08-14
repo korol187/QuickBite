@@ -1,98 +1,86 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Restaurant Service
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This service is responsible for managing restaurant profiles and menus for the QuickBite application.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Table of Contents
 
-## Description
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Usage](#usage)
+  - [Running the Service](#running-the-service)
+  - [API Endpoints](#api-endpoints)
+- [Database](#database)
+- [Architecture](#architecture)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Architecture
 
-## Project setup
+This service follows a layered architecture, which is a key principle of Domain-Driven Design (DDD). The code is organized into three distinct layers:
 
-```bash
-$ npm install
-```
+-   **Domain Layer:** This is the core of the service. It contains the business logic, entities, and value objects that represent the domain. This layer is completely independent of any external frameworks or technologies.
 
-## Compile and run the project
+-   **Application Layer:** This layer orchestrates the use cases of the application. It contains the application services that are called by the controllers. It acts as a bridge between the domain layer and the infrastructure layer.
 
-```bash
-# development
-$ npm run start
+-   **Infrastructure Layer:** This layer is responsible for all the technical details, such as database access, external API calls, and message queueing. It implements the interfaces defined in the domain layer.
 
-# watch mode
-$ npm run start:dev
+This separation of concerns makes the codebase more modular, testable, and easier to maintain.
 
-# production mode
-$ npm run start:prod
-```
+## Getting Started
 
-## Run tests
+### Prerequisites
+
+- [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/)
+- [Node.js](https://nodejs.org/) (v24.5.0 or higher)
+
+### Installation
+
+Project-level dependencies should be installed from the root of the monorepo.
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
 ```
 
-## Deployment
+## Usage
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### Running the Service
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+This service is managed through Docker Compose.
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+1.  **Start the service:**
+    To run this service along with its dependencies (like the MongoDB database), use the following command from the project root:
+    ```bash
+    docker-compose up restaurant-service
+    ```
+    To run in detached mode:
+    ```bash
+    docker-compose up -d restaurant-service
+    ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+2.  **Hot Reloading:**
+    The service is configured for hot reloading. Any changes made to the `src` directory will automatically restart the service within the container.
 
-## Resources
+### API Endpoints
 
-Check out a few resources that may come in handy when working with NestJS:
+The following endpoints are currently available:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+-   **`GET /health`**
+    -   **Description:** Checks the health of the service.
+    -   **Response:**
+        ```json
+        {
+          "status": "ok"
+        }
+        ```
+-   **`GET /restaurants`**
+    -   **Description:** Returns a list of all restaurants. (Currently returns a placeholder string).
+    -   **Response:**
+        ```json
+        "This action returns all restaurants"
+        ```
 
-## Support
+## Database
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+This service uses a **MongoDB** database to store restaurant and menu data. The connection is managed by the `docker-compose.yaml` file, which starts a dedicated `mongo` container.
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+-   **Database Name:** `quickbite_restaurants`
+-   **Connection URL (from within Docker network):** `mongodb://mongo:27017/quickbite_restaurants`

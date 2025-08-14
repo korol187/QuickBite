@@ -43,6 +43,7 @@ export class AuthService {
         data: {
           email: registerUserDto.email,
           password: hashedPassword,
+          role: registerUserDto.role, // Added this line
         },
       });
 

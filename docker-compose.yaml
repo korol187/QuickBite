@@ -109,10 +109,11 @@ services:
     environment:
       NODE_ENV: development
       DATABASE_URL: "mongodb://mongo:27017/quickbite_restaurants"
+      JWT_SECRET: "your-super-secret-jwt-key-change-in-production"
     volumes:
       - ./services/restaurant-service/src:/usr/src/app/src # Mount source code for hot reload
-      - ./services/restaurant-service/package.json:/usr/src/app/package.json:ro
-      - ./services/restaurant-service/package-lock.json:/usr/src/app/package-lock.json:ro
+      - ./services/restaurant-service/package.json:/usr/src/app/package.json
+      - ./services/restaurant-service/package-lock.json:/usr/src/app/package-lock.json
       - ./services/restaurant-service/tsconfig.json:/usr/src/app/tsconfig.json:ro
       - ./services/restaurant-service/tsconfig.build.json:/usr/src/app/tsconfig.build.json:ro
       - ./services/restaurant-service/nest-cli.json:/usr/src/app/nest-cli.json:ro

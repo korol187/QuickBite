@@ -14,6 +14,18 @@ This service is built to demonstrate proficiency in backend development, databas
 - **Authentication:** Passport.js with JWT Strategy
 - **Containerization:** Docker
 
+## Architecture
+
+This service follows a layered architecture, which is a key principle of Domain-Driven Design (DDD). The code is organized into three distinct layers:
+
+-   **Domain Layer:** This is the core of the service. It contains the business logic, entities, and value objects that represent the domain. This layer is completely independent of any external frameworks or technologies.
+
+-   **Application Layer:** This layer orchestrates the use cases of the application. It contains the application services that are called by the controllers. It acts as a bridge between the domain layer and the infrastructure layer.
+
+-   **Infrastructure Layer:** This layer is responsible for all the technical details, such as database access, external API calls, and message queueing. It implements the interfaces defined in the domain layer.
+
+This separation of concerns makes the codebase more modular, testable, and easier to maintain.
+
 ## Environment Variables
 
 To run this service, you need to configure the following environment variables. You can create a `.env` file in this directory (`services/identity-service`) to store them for local development.

@@ -70,7 +70,7 @@ export default tseslint.config(
             },
           ],
           pathGroupsExcludedImportTypes: ['builtin'],
-          'newlines-between': 'always',
+          'newlines-between': 'never',
           alphabetize: {
             order: 'asc',
             caseInsensitive: true,
