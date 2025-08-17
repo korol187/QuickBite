@@ -20,6 +20,7 @@ import { Restaurant } from './schemas/restaurant.schema';
 
 @Controller('restaurants')
 @UseGuards(RolesGuard) // Only RolesGuard remains
+@UseInterceptors(JwtAuthInterceptor)
 // @UseInterceptors(JwtAuthInterceptor) // Removed this line
 export class RestaurantsController {
   constructor(private readonly restaurantsService: RestaurantsService) {}
